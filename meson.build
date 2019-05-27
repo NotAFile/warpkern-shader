@@ -12,4 +12,4 @@ sources = [
   'spi.c',
 ]
 
-executable('warpkern-shader', sources, dependencies : [gldep, glfwdep, fmtdep, gladdep])
+executable('warpkern-shader', sources, dependencies : [gldep, glfwdep, fmtdep, gladdep, wiringpidep])
