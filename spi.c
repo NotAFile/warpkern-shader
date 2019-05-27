@@ -42,7 +42,7 @@ void send_color(int stripes, int leds, uint8_t* pixbuf) {
   }
 }
 
-int main(void)
+void init_leds()
 {
   wiringPiSetup();
 
@@ -50,20 +50,5 @@ int main(void)
   if (fd == -1) {
     perror("SPI Channel setup failed");
     abort();
-  }
-
-  struct timespec gettime_now;
-  long start;
-  long frame = 0;
-  while(frames < 0 || frame < frames) {
-    clock_gettime(CLOCK_REALTIME, &gettime_now);
-    start = gettime_now.tv_nsec;
-
-    send_color(12,192, (255-frame*16)%255, frame*16, 0);
-
-    frame++;
-    clock_gettime(CLOCK_REALTIME, &gettime_now);
-    useconds_t toSleep = ((1/fps)*1000000 - (gettime_now.tv_nsec - start)/1000.0);
-    usleep(toSleep);
   }
 }

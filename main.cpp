@@ -112,6 +112,8 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    init_leds();
+
     fmt::print("Load From File\n");
     // we need this scope for now because the shader must get deleted before
     // glfwTerminate
