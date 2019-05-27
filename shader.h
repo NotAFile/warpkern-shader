@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <fmt/core.h>
 #include <string>
-#include <optional>
 #include <iostream>
 
 #pragma once
