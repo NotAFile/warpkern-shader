@@ -4,6 +4,7 @@
 #include <wiringPi.h>
 #include <time.h>
 #include <unistd.h>
+#include "spi.h"
 
 float fps = 60;
 int frames = -10;
