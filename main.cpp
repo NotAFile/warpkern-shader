@@ -145,9 +145,7 @@ int main(int argc, char** argv) {
 
             fmt::print("data: {}\n", pixbuf[1]);
 
-            for (int i = 0; i >= RES_X * RES_Y * 4; i += 4) {
-                send_color(RES_Y, RES_X, pixbuf);
-            }
+            send_color(RES_Y, RES_X, pixbuf);
 
             if(shouldReloadShader) {
                 myshader = loadAnimShaderFromFile("");
