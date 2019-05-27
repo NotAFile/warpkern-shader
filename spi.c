@@ -8,7 +8,7 @@
 float fps = 60;
 int frames = -10;
 
-void send_color(int stripes, int leds, int r, int g, int b) {
+void send_color(int stripes, int leds, uint8_t* pixbuf) {
   unsigned char buffer[(2+192*12)*4];
   int i = 0;
   // start frame -> 32bit all 0
@@ -22,9 +22,9 @@ void send_color(int stripes, int leds, int r, int g, int b) {
     for (l=0; l < leds; l++){
       // first led -> 32bit all 1
       buffer[i] = 0b11100001; i++;
-      buffer[i] = b; i++;   // blue
-      buffer[i] = g; i++;   // green
-      buffer[i] = r; i++;   // red
+      buffer[i] = pixbuf[2 + (s * leds + l) * 4]; i++;   // blue
+      buffer[i] = 0; i++;   // green
+      buffer[i] = 0; i++;   // red
     }
   }
 

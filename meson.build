@@ -8,6 +8,7 @@ gladdep = subproject('glad').get_variable('glad_dep')
 sources = [
   'main.cpp',
   'shader.cpp',
+  'spi.c',
 ]
 
 executable('warpkern-shader', sources, dependencies : [gldep, glfwdep, fmtdep, gladdep])

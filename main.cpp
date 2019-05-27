@@ -5,8 +5,9 @@
 #include <iostream>
 #include <fstream>
 #include "shader.h"
+#include "spi.h"
 
-static const int RES_X = 191;
+static const int RES_X = 192;
 static const int RES_Y = 12;
 // 1.6cm / 50cm
 static const float RES_RATIO = 1.6 / 50.0;
@@ -118,6 +119,11 @@ int main(int argc, char** argv) {
         Shader myshader = loadAnimShaderFromFile("");
         myshader.use();
         fmt::print("Start Loop\n");
+
+        GLubyte pixbuf[RES_X * RES_Y * 4];
+
+        glPixelStorei(GL_PACK_ALIGNMENT, 0);
+
         while(!glfwWindowShouldClose(window))
         {
             processInput(window);
@@ -130,10 +136,16 @@ int main(int argc, char** argv) {
             myshader.setUniform1f("iTime", timeValue);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+            glReadPixels(0, 0, RES_X, RES_Y, GL_RGBA, GL_UNSIGNED_BYTE, pixbuf);
+
             glfwSwapBuffers(window);
             glfwPollEvents();
 
-            // glReadPixels(0, 0, RES_X, RES_Y, GL_RGB, GL_UNSIGNED_BYTE);
+            fmt::print("data: {}\n", pixbuf[1]);
+
+            for (int i = 0; i >= RES_X * RES_Y * 4; i += 4) {
+                send_color(RES_Y, RES_X, pixbuf);
+            }
 
             if(shouldReloadShader) {
                 myshader = loadAnimShaderFromFile("");
