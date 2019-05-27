@@ -1,6 +1,6 @@
 #include "shader.h"
 
-std::optional<std::string> getShaderInfoLog(GLuint shaderId) {
+std::string getShaderInfoLog(GLuint shaderId) {
     int  success;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
 
@@ -10,10 +10,10 @@ std::optional<std::string> getShaderInfoLog(GLuint shaderId) {
         glGetShaderInfoLog(shaderId, 512, NULL, infoLog);
         return std::string(infoLog);
     }
-    return {};
+    return "";
 }
 
-std::optional<std::string> getProgramInfoLog(GLuint programID) {
+std::string getProgramInfoLog(GLuint programID) {
     int  success;
     glGetProgramiv(programID, GL_LINK_STATUS, &success);
 
@@ -23,25 +23,25 @@ std::optional<std::string> getProgramInfoLog(GLuint programID) {
         glGetProgramInfoLog(programID, 512, NULL, infoLog);
         return std::string(infoLog);
     }
-    return std::nullopt;
+    return "";
 }
 
 Shader::Shader(const GLchar* vertexShaderSource, const GLchar* fragmentShaderSource) {
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
-    fmt::print("vert: {}\n", getShaderInfoLog(vertexShader).value_or("vert ok"));
+    fmt::print("vert: {}\n", getShaderInfoLog(vertexShader));
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
-    fmt::print("vert: {}\n", getShaderInfoLog(fragmentShader).value_or("frag ok"));
+    fmt::print("vert: {}\n", getShaderInfoLog(fragmentShader));
 
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
-    fmt::print("link: {}\n", getShaderInfoLog(fragmentShader).value_or("link ok"));
+    fmt::print("link: {}\n", getShaderInfoLog(fragmentShader));
 
     progID = shaderProgram;
 

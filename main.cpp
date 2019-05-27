@@ -12,6 +12,7 @@ static const int RES_Y = 12;
 static const float RES_RATIO = 1.6 / 50.0;
 
 bool shouldReloadShader = false;
+bool reloadPressed = false;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -28,8 +29,14 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
-        shouldReloadShader = true;
+    if(glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+        if(!reloadPressed) {
+            shouldReloadShader = true;
+            reloadPressed = true;
+        }
+    } else {
+        reloadPressed = false;
+    }
 }
 
 Shader loadAnimShaderFromFile(const std::string& path) {
@@ -125,6 +132,8 @@ int main(int argc, char** argv) {
 
             glfwSwapBuffers(window);
             glfwPollEvents();
+
+            // glReadPixels(0, 0, RES_X, RES_Y, GL_RGB, GL_UNSIGNED_BYTE);
 
             if(shouldReloadShader) {
                 myshader = loadAnimShaderFromFile("");

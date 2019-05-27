@@ -1,4 +1,4 @@
-project('warpkern-shader', 'cpp', default_options : ['cpp_std=c++17'])
+project('warpkern-shader', 'cpp', default_options : ['cpp_std=c++14'])
 
 gldep = dependency('gl')
 glfwdep = dependency('glfw3')
