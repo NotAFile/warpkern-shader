@@ -15,10 +15,12 @@ static const float RES_RATIO = 1.6 / 50.0;
 bool shouldReloadShader = false;
 bool reloadPressed = false;
 
+int xres, yres;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     fmt::print("resize! {}x{}\n", width, height);
-    // glViewport(0, 0, width, height);
+    xres = width;
+    yres = height;
 }
 
 void error_callback(int code, const char* description)
@@ -40,13 +42,13 @@ void processInput(GLFWwindow *window)
     }
 }
 
-Shader loadAnimShaderFromFile(const std::string& path) {
-    std::ifstream fragmentShaderFile("../lib.frag");
+Shader loadShaderFromFiles(const std::string& fspath, const std::string& vspath) {
+    std::ifstream fragmentShaderFile(fspath);
     std::string fragmentShaderSource(
             (std::istreambuf_iterator<char>(fragmentShaderFile)),
             std::istreambuf_iterator<char>());
 
-    std::ifstream vertexShaderFile("../basic.vert");
+    std::ifstream vertexShaderFile(vspath);
     std::string vertexShaderSource(
             (std::istreambuf_iterator<char>(vertexShaderFile)),
             std::istreambuf_iterator<char>());
@@ -95,8 +97,6 @@ int main(int argc, char** argv) {
         fmt::print("OpenGL error: {}", err);
     }
 
-    glViewport(0, 0, RES_X, RES_Y);
-
     float vertices[] = {
         -1.f, 1.f,
          1.f, 1.f,
@@ -112,15 +112,37 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    GLuint fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, RES_X, RES_Y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     init_leds();
 
     fmt::print("Load From File\n");
     // we need this scope for now because the shader must get deleted before
     // glfwTerminate
     {
-        Shader myshader = loadAnimShaderFromFile("");
-        myshader.use();
         fmt::print("Start Loop\n");
+
+        Shader myshader;
+        shouldReloadShader = true;
 
         GLubyte pixbuf[RES_X * RES_Y * 4];
 
@@ -130,28 +152,38 @@ int main(int argc, char** argv) {
         {
             processInput(window);
 
+            if(shouldReloadShader) {
+                myshader = loadShaderFromFiles("../lib.frag", "../basic.vert");
+                shouldReloadShader = false;
+                break;
+            }
+
+            // render texture
+            glViewport(0, 0, RES_X, RES_Y);
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            myshader.use();
 
             float timeValue = glfwGetTime();
             myshader.setUniform3f("iResolution", RES_X, RES_Y, RES_RATIO);
             myshader.setUniform1f("iTime", timeValue);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+            // read out result
             glReadPixels(0, 0, RES_X, RES_Y, GL_RGBA, GL_UNSIGNED_BYTE, pixbuf);
+            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+            // render main buffer
+            glViewport(0, 0, xres, yres);
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+
+            // swap
             glfwSwapBuffers(window);
             glfwPollEvents();
 
-            fmt::print("data: {}\n", pixbuf[1]);
-
             send_color(RES_Y, RES_X, pixbuf);
-
-            if(shouldReloadShader) {
-                myshader = loadAnimShaderFromFile("");
-                myshader.use();
-                shouldReloadShader = false;
-            }
         }
     }
 

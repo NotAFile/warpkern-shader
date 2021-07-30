@@ -71,6 +71,6 @@ void main() {
     float col2 = float(min(gl_FragCoord.y/10.0 + d, 1.0 - (gl_FragCoord.y/10.0 + d)) + 0.3 > 0.3);
     float col3 = float(col < col2);
     float holes = float(mod(gl_FragCoord.x, width * 2.0) > width);
-    // gl_FragColor = vec4(col3 * holes * vec3(0.0, 0.8, 1.0), 1.0);
-    gl_FragColor = vec4(1.);
+    gl_FragColor = vec4(col3 * holes * vec3(0.0, 0.8, 1.0), 1.0);
+    // gl_FragColor = vec4(1.);
 }

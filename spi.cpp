@@ -1,14 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <wiringPiSPI.h>
-#include <wiringPi.h>
 #include <time.h>
 #include <unistd.h>
 #include "spi.h"
+#include <cstdint>
+
+#ifdef USE_WIRINGPI
+#include <wiringPi.h>
+#include <wiringPiSPI.h>
+#endif
 
 float fps = 60;
 int frames = -10;
 
+#ifdef USE_WIRINGPI
 void send_color(int stripes, int leds, uint8_t* pixbuf) {
   unsigned char buffer[(2+192*12)*4];
   int i = 0;
@@ -52,3 +57,12 @@ void init_leds()
     abort();
   }
 }
+#else
+void init_leds() {
+    printf("init leds\n");
+}
+
+void send_color(int stripes, int leds, uint8_t* pixbuf) {
+    // printf("send colors\n");
+}
+#endif

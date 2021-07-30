@@ -6,10 +6,11 @@
 #pragma once
 
 class Shader {
-    GLuint progID;
+    GLuint progID = -1;
 public:
 
     Shader(const GLchar* vertexShader, const GLchar* fragmentShader);
+    Shader(){std::cout << "shader empty" << std::endl;};
     ~Shader();
 
     void use();
